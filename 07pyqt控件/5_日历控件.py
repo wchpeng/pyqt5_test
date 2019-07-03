@@ -24,7 +24,7 @@ class Example(QWidget):
         # 下面三行是获取当前日期并赋值给 lab，如果没有这两行，lab 初始为空，再赋值时就会出现长度不够显示的问题
         # 就算是这样也会出现那个问题，因为月份和号数有单有双
         date = cal.selectedDate()
-        date_str = date.toString().ljust(17)  #这里如果不转化为 17 个字符，当月份和号数都为双数时会显示不全，如：12月25日
+        date_str = date.toString()  #这里如果不转化为 17 个字符，当月份和号数都为双数时会显示不全，如：12月25日
         self.lab.setText(date_str)
 
         self.setGeometry(100, 100, 360, 300)
@@ -34,7 +34,9 @@ class Example(QWidget):
 
     def show_date(self, date):
         # date 是 PyQt5.QtCore.QDate 类型的数据，toString 转化为字符串
-        self.lab.setText(date.toString().ljust(17))
+        # self.lab.setText(date.toString().ljust(17))
+        self.lab.setText(date.toString())
+        self.lab.adjustSize()
 
 
 if __name__ == '__main__':
