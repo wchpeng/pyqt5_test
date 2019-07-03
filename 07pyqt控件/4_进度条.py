@@ -20,7 +20,7 @@ class Example(QWidget):
         self.btn.move(40, 80)
         self.btn.clicked.connect(self.do_action)
 
-        self.timer = QBasicTimer()
+        self.timer = QBasicTimer()  # 添加定时器
         self.step = 0
 
         self.setGeometry(100, 100, 300, 300)
@@ -29,20 +29,21 @@ class Example(QWidget):
         self.show()
 
     def timerEvent(self, event):
+        # 定时器每次执行的事件
         if self.step >= 100:
             self.timer.stop()
             self.btn.setText('finished')
             return
 
         self.step += 1
-        self.pbar.setVal(self.step)
+        self.pbar.setValue(self.step)
 
     def do_action(self):
         if self.timer.isActive():
-            self.timer.stop()
+            self.timer.stop()  # 暂停定时器工作
             self.btn.setText('start')
         else:
-            self.timer.start(100, self)
+            self.timer.start(100, self)  # 设置定时器的每次执行的时间，毫秒，100 表示 100 毫秒
             self.btn.setText('stop')
 
 
