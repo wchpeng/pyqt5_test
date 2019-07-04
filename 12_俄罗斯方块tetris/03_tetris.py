@@ -1,12 +1,13 @@
 import sys
+import time
 import copy
 import random
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSignal, QBasicTimer
+from PyQt5.QtCore import pyqtSignal, QBasicTimer, Qt
 from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFrame
 
-SPEED = 300  # ms
+SPEED = 500  # ms
 WIDTH_GRID = 20
 HEIGHT_GTID = 40
 
@@ -54,6 +55,10 @@ class Board(QFrame):
 
     def __init__(self, parent):
         super(Board, self).__init__(parent)
+
+        self.is_paused = False  # 是否被暂停
+        self.num_lines_removed = 0  # 被删除的行数
+
         self.cur_x = 0
         self.cur_y = 0
         self.cur_shape = None
@@ -71,12 +76,84 @@ class Board(QFrame):
 
     def timerEvent(self, e):
         print(e)
-        print("timer work")
+        print("timer work", time.time())
+        self.shape_down1line(0, -1)
 
     def new_shape(self):
+        # 新建 shape
         self.cur_x = WIDTH_GRID // 2 - 0.5
         self.cur_y = HEIGHT_GTID
         self.cur_shape = Shape()
+        self.cur_shape.set_random_shape()
+        self.draw_shape()
+
+    def shape_down1line(self, x_offset, y_offset):
+        # shape 往下移动一行
+        if self.move_shape(self.cur_shape.move(x_offset, y_offset), x_offset, y_offset):
+            self.update()
+
+    def shape_drop_down(self):
+        # 直接移动到底部
+        while self.shape_down1line(0, -1):
+            pass
+
+    def shape_pause(self):
+        if self.is_paused:
+            self.timer.start(SPEED)
+            self.msg2status_bar.emit("分数：" + str(self.num_lines_removed))
+        else:
+            self.timer.stop()
+            self.msg2status_bar.emit("暂停")
+
+        self.is_paused = not self.is_paused
+        self.update()
+
+    def keyPressEvent(self, event):
+        key = event.key()
+
+        if key == Qt.Key_Up:
+            # 上：左转
+            pass
+        elif key == Qt.Key_Down:
+            # 下：右转
+            pass
+        elif key == Qt.Key_Left:
+            # 左移
+            self.shape_down1line(-1, 0)
+        elif key == Qt.Key_Right:
+            # 右移
+            self.shape_down1line(1, 0)
+        elif key == Qt.Key_P:
+            # 暂停
+            pass
+        elif key == Qt.Key_Space:
+            # 空格：直接下到最后一行
+            self.shape_drop_down()
+
+    def move_shape(self, shape, x_offset, y_offset):
+        for i in range(len(shape.coors)):
+            x = shape.get_x(i) + self.cur_x
+            y = shape.get_y(i) + self.cur_y
+
+            if x < 0 or x >= WIDTH_GRID or y < 0 or y > HEIGHT_GTID:
+                # 设定不能超出边界
+                return False
+            if self.boards[self.get_index_in_boards(x, y)] != ShapeType.No_shape:
+                # 如果 x y 这个坐标在 boards 中不是空形状，返回 False
+                return False
+
+        self.cur_x += x_offset
+        self.cur_y += y_offset
+        self.cur_shape = shape
+        self.update()
+        return True
+
+    @classmethod
+    def get_index_in_boards(cls, x, y):
+        return y * WIDTH_GRID + x
+
+    def draw_shape(self):
+        pass
 
 
 class ShapeType:
@@ -109,15 +186,51 @@ class Shape(object):
 
     def set_random_shape(self):
         self.shape_type = random.randint(1, len(ShapeType.Coors_table))
+        self.coors = copy.deepcopy(ShapeType.Coors_table[self.shape_type])
+        return self.shape_type
 
     def set_shape_coors(self, shape_type):
+        self.shape_type = shape_type
         self.coors = copy.deepcopy(ShapeType.Coors_table[shape_type])
 
+    def set_x(self, index, x):
+        self.coors[index][0] = x
+
+    def get_x(self, index):
+        return self.coors[index][0]
+
+    def set_y(self, index, y):
+        self.coors[index][1] = y
+
+    def get_y(self, index):
+        return self.coors[index][1]
+
+    def move(self, x_offset, y_offset):
+        # 水平、垂直 移动，传入每次移动的偏移量
+        shape = Shape()
+        shape.set_shape_coors(self.shape_type)
+        for i in self.coors:
+            shape.set_x(i, shape.get_x(i) + x_offset)
+            shape.set_y(i, shape.get_y(i) + y_offset)
+        return shape
+
     def rotate_left(self):
-        pass
+        # 向左旋转 90 度
+        shape = Shape()
+        shape.set_shape_coors(self.shape_type)
+        for i in range(len(shape.coors)):
+            shape.set_x(i, -shape.get_y(i))
+            shape.set_y(i, shape.get_x(i))
+        return shape
 
     def rotate_right(self):
-        pass
+        # 向右旋转 90 度
+        shape = Shape()
+        shape.set_shape_coors(self.shape_type)
+        for i in range(len(shape.coors)):
+            shape.set_x(i, shape.get_y(i))
+            shape.set_y(i, -shape.get_x(i))
+        return shape
     
 
 if __name__ == '__main__':
