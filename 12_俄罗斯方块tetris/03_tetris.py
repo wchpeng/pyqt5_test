@@ -3,7 +3,7 @@ import time
 import copy
 import random
 
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPainter
 from PyQt5.QtCore import pyqtSignal, QBasicTimer, Qt
 from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFrame
 
@@ -77,12 +77,13 @@ class Board(QFrame):
     def timerEvent(self, e):
         print(e)
         print("timer work", time.time())
-        self.shape_down1line(0, -1)
+        self.shape_down1line(0, 1)
+        self.draw_shape()
 
     def new_shape(self):
         # 新建 shape
         self.cur_x = WIDTH_GRID // 2 - 0.5
-        self.cur_y = HEIGHT_GTID
+        self.cur_y = 0
         self.cur_shape = Shape()
         self.cur_shape.set_random_shape()
         self.draw_shape()
@@ -94,7 +95,7 @@ class Board(QFrame):
 
     def shape_drop_down(self):
         # 直接移动到底部
-        while self.shape_down1line(0, -1):
+        while self.shape_down1line(0, 1):
             pass
 
     def shape_pause(self):
@@ -125,7 +126,7 @@ class Board(QFrame):
             self.shape_down1line(1, 0)
         elif key == Qt.Key_P:
             # 暂停
-            pass
+            self.shape_pause()
         elif key == Qt.Key_Space:
             # 空格：直接下到最后一行
             self.shape_drop_down()
@@ -153,8 +154,18 @@ class Board(QFrame):
         return y * WIDTH_GRID + x
 
     def draw_shape(self):
-        pass
+        qp = QPainter()
+        qp.begin(self)
+        for i in range(len(self.cur_shape.coors)):
+            pass
 
+        qp.end()
+
+    def painter_square(self, x, y):
+        qp = QPainter()
+        qp.begin(self)
+
+        qp.end()
 
 class ShapeType:
     Coors_table = (
