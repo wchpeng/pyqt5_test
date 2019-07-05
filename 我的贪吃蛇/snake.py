@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
 
 
 class Snake(QMainWindow):
+
     def __init__(self):
         super(Snake, self).__init__()
 
@@ -27,7 +28,7 @@ class Snake(QMainWindow):
         menu.addAction(self.degree_of_difficulty_action())
         menu.addAction(self.pause_action())
 
-        self.setGeometry(100, 100, 15 * (Board.WIDTH + 1), 15 * (Board.HEIGHT + 1) + 45)
+        self.setGeometry(100, 100, 15*(Board.WIDTH+1), 15*(Board.HEIGHT+1)+45)
         self.setWindowIcon(QIcon('./01.jpg'))
         self.setWindowTitle('贪吃蛇')
         self.show()
@@ -43,7 +44,7 @@ class Snake(QMainWindow):
         degree.setShortcut('Ctrl+Alt+S')
         degree.triggered.connect(self.init_setting)
         return degree
-
+    
     def pause_action(self):
         pause = QAction(QIcon('./stop.jpg'), '&暂停', self)
         pause.setShortcut('Ctrl+Alt+T')
@@ -74,24 +75,24 @@ class Snake(QMainWindow):
             self.setting.show()
             return
         self.setting = Setting()
-        x = self.geometry().left() + self.geometry().width() // 2 - self.setting.contentsRect().width() // 2
-        y = self.geometry().top() + self.geometry().height() // 2 - self.setting.contentsRect().height() // 2 - 20
+        x = self.geometry().left() + self.geometry().width()//2 - self.setting.contentsRect().width()//2
+        y = self.geometry().top() + self.geometry().height()//2 - self.setting.contentsRect().height()//2 - 20
         self.setting.move(x, y)
         self.setting.show()
         self.setting.confirm.clicked.connect(self.setting.hide)
         self.setting.confirm.clicked.connect(self.setting_speed)
 
     def setting_speed(self):
-        Board.SPEED = Board.BASE_SPEED - self.setting.value * 2
+        Board.SPEED = Board.BASE_SPEED - self.setting.value*2
         if Board.SPEED < 50:
             Board.SPEED = 50
-            # self.board.depaused()
+        # self.board.depaused()
 
     def init_snake_dead_tips(self, msg):
         # 蛇死亡时显示确认框
         self.snake_dead_tips = SnakeDeadTips(msg)
-        x = self.geometry().left() + self.geometry().width() // 2 - self.snake_dead_tips.contentsRect().width() // 2
-        y = self.geometry().top() + self.geometry().height() // 2 - self.snake_dead_tips.contentsRect().height() // 2 - 20
+        x = self.geometry().left() + self.geometry().width()//2 - self.snake_dead_tips.contentsRect().width()//2
+        y = self.geometry().top() + self.geometry().height()//2 - self.snake_dead_tips.contentsRect().height()//2 - 20
         self.snake_dead_tips.move(x, y)
         self.snake_dead_tips.show()
         self.snake_dead_tips.ok.clicked.connect(self.init_board)
@@ -99,6 +100,7 @@ class Snake(QMainWindow):
 
 
 class Setting(QWidget):
+
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -111,6 +113,7 @@ class Setting(QWidget):
         self.init_ui()
 
     def init_ui(self):
+
         self.confirm = QPushButton('确认')
         self.confirm.clicked.connect(self.close)
 
@@ -136,12 +139,14 @@ class Setting(QWidget):
 
 
 class SnakeDeadTips(QWidget):
+
     def __init__(self, msg):
         super(SnakeDeadTips, self).__init__()
         self.msg = msg
         self.init_ui()
 
     def init_ui(self):
+
         tips = QLabel(self.msg)
         tips.setFont(QFont('SansSerif', 10))
 
@@ -159,11 +164,12 @@ class SnakeDeadTips(QWidget):
         vbox.addLayout(grid)
 
         self.setLayout(vbox)
-        self.resize(15 * (Board.WIDTH // 2), 15 * (Board.HEIGHT // 2))
+        self.resize(15*(Board.WIDTH//2), 15*(Board.HEIGHT//2))
         self.show()
 
 
 class Board(QFrame):
+
     msg2status_bar = pyqtSignal(str)
     snake_dead_tips = pyqtSignal(str)
 
@@ -263,7 +269,7 @@ class Board(QFrame):
         x *= width
         y *= height
 
-        qp.fillRect(x + 1, y + 1, width - 2, height - 2, color)
+        qp.fillRect(x+1, y+1, width-2, height-2, color)
 
         qp.setPen(color.lighter())
         qp.setPen(color.darker())
@@ -278,6 +284,7 @@ class Board(QFrame):
 
 
 class SnakeNode(object):
+
     BODY_COLOR = '#00f'
     STAR_COLOR = '#000'
     HEADER_COLOR = '#f00'
@@ -288,8 +295,8 @@ class SnakeNode(object):
         self.star_y = -1
         self.direct_x = 1  # 初始为向左水平运动
         self.direct_y = 0  # 初始 y 轴不变
-        self.nodes = [(Board.WIDTH // 2, Board.HEIGHT // 2)]  # 存放蛇的每一节的坐标，定义初始点
-        self.nodes_set = {(Board.HEIGHT // 2) * Board.WIDTH + Board.WIDTH // 2}  # 存放坐标转化为int
+        self.nodes = [(Board.WIDTH // 2, Board.HEIGHT//2)]  # 存放蛇的每一节的坐标，定义初始点
+        self.nodes_set = {(Board.HEIGHT//2)*Board.WIDTH + Board.WIDTH//2}  # 存放坐标转化为int
 
         self.waiting_new_star = True  # 等待新的'星'
 
@@ -332,7 +339,7 @@ class SnakeNode(object):
 
     @staticmethod
     def coordinate2int(x, y):
-        return y * Board.WIDTH + x
+        return y*Board.WIDTH + x
 
     def set_new_star(self):
         x = random.randint(0, Board.WIDTH - 1)

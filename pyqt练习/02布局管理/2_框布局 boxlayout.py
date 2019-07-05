@@ -25,6 +25,7 @@ class Example(QWidget):
         # 垂直盒子 VBoxLayout vertical
         vbox = QVBoxLayout()
         vbox.addStretch(1)  # 垂直方向加了一个伸展因子，让按钮向下靠齐
+        # vbox.addWidget(mid)
         vbox.addLayout(hbox)
 
         self.setLayout(vbox)
