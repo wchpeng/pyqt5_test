@@ -1,3 +1,4 @@
+import os
 import sys
 import random
 
@@ -7,6 +8,9 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QFrame, QAction, QLabel, QVBoxLayout, QGridLayout,
     QWidget, QPushButton, QLCDNumber, QSlider
 )
+
+qt_plugin_platform = os.path.join(os.path.dirname(os.path.abspath(PyQt5.__file__)), 'Qt', 'plugins', 'platforms')
+os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = qt_plugin_platform
 
 
 class Snake(QMainWindow):
